@@ -1,3 +1,8 @@
+## NOTICE
+# The UI has been changed from original to accomodate a project.
+# README file will be updated in the future
+
+
 # react-native-media-controls
 A sweet UI component to manipulate your media. Strongly typed using Typescript.
 
