@@ -13,8 +13,8 @@ import { Slider, CustomSliderStyle } from "./Slider";
 import { Toolbar } from "./Toolbar";
 
 export type Props = {
-  children: React.ReactNode;
-  containerStyle: ViewStyle;
+  children?: React.ReactNode;
+  containerStyle?: ViewStyle;
   duration: number;
   fadeOutDelay?: number;
   isFullScreen: boolean;
@@ -30,11 +30,12 @@ export type Props = {
   showOnStart?: boolean;
   sliderStyle?: CustomSliderStyle;
   toolbarStyle?: ViewStyle;
+  volume: number;
+  onVolumeChange: () => void;
 };
 
 const MediaControls = (props: Props) => {
   const {
-    children,
     containerStyle: customContainerStyle = {},
     duration,
     fadeOutDelay = 5000,
@@ -48,7 +49,8 @@ const MediaControls = (props: Props) => {
     progress,
     showOnStart = true,
     sliderStyle, // defaults are applied in Slider.tsx
-    toolbarStyle: customToolbarStyle = {},
+    onVolumeChange,
+    volume,
   } = props;
   const { initialOpacity, initialIsVisible } = (() => {
     if (showOnStart) {
@@ -66,10 +68,7 @@ const MediaControls = (props: Props) => {
 
   const [opacity] = useState(new Animated.Value(initialOpacity));
   const [isVisible, setIsVisible] = useState(initialIsVisible);
-
-  useEffect(() => {
-    fadeOutControls(fadeOutDelay);
-  }, []);
+  const [isSliderVisible, setIsSliderVisible] = useState(initialIsVisible);
 
   const fadeOutControls = (delay = 0) => {
     Animated.timing(opacity, {
@@ -86,8 +85,20 @@ const MediaControls = (props: Props) => {
     });
   };
 
+  useEffect(() => {
+    fadeOutControls(fadeOutDelay);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleVolumePress = () => {
+    onVolumeChange();
+  };
+
   const fadeInControls = (loop = true) => {
     setIsVisible(true);
+    if (!isSliderVisible) {
+      setIsSliderVisible(true);
+    }
     Animated.timing(opacity, {
       toValue: 1,
       duration: 300,
@@ -108,9 +119,9 @@ const MediaControls = (props: Props) => {
   const cancelAnimation = () => opacity.stopAnimation(() => setIsVisible(true));
 
   const onPause = () => {
-    const { playerState, onPaused } = props;
+    const { playerState: pState, onPaused } = props;
     const { PLAYING, PAUSED, ENDED } = PLAYER_STATES;
-    switch (playerState) {
+    switch (pState) {
       case PLAYING: {
         cancelAnimation();
         break;
@@ -119,8 +130,12 @@ const MediaControls = (props: Props) => {
         fadeOutControls(fadeOutDelay);
         break;
       }
-      case ENDED:
+      case ENDED: {
         break;
+      }
+      default: {
+        break;
+      }
     }
 
     const newPlayerState = playerState === PLAYING ? PAUSED : PLAYING;
@@ -143,22 +158,6 @@ const MediaControls = (props: Props) => {
       >
         {isVisible && (
           <View style={[styles.container, customContainerStyle]}>
-            <View
-              style={[
-                styles.controlsRow,
-                styles.toolbarRow,
-                customToolbarStyle,
-              ]}
-            >
-              {children}
-            </View>
-            <Controls
-              onPause={onPause}
-              onReplay={onReplay}
-              isLoading={isLoading}
-              mainColor={mainColor}
-              playerState={playerState}
-            />
             <Slider
               progress={progress}
               duration={duration}
@@ -169,6 +168,15 @@ const MediaControls = (props: Props) => {
               onSeeking={onSeeking}
               onPause={onPause}
               customSliderStyle={sliderStyle}
+            />
+            <Controls
+              onPause={onPause}
+              onReplay={onReplay}
+              isLoading={isLoading}
+              mainColor={mainColor}
+              playerState={playerState}
+              onVolumePress={handleVolumePress}
+              volume={volume}
             />
           </View>
         )}
