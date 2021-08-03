@@ -5,8 +5,7 @@ const white = "#fff";
 export default StyleSheet.create({
   container: {
     alignItems: "center",
-    // backgroundColor: containerBackgroundColor,
-    backgroundColor: "blue",
+    backgroundColor: "transparent",
     bottom: 0,
     flex: 1,
     flexDirection: "column",
