@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { ViewStyle } from "react-native";
 import { Props as MediaControlsProps } from "./MediaControls";
 export declare type CustomSliderStyle = {

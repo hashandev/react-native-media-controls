@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, ActivityIndicator, TouchableOpacity, Image, View, Text, Animated, TouchableWithoutFeedback } from 'react-native';
-import RNSlider from 'react-native-slider';
+import { StyleSheet, View, TouchableOpacity, Image, Text, Animated, TouchableWithoutFeedback } from 'react-native';
+import RNSlider from '@react-native-community/slider';
 
-var containerBackgroundColor = "rgba(45, 59, 62, 0.4)";
-var playButtonBorderColor = "rgba(255,255,255,0.5)";
 var white = "#fff";
 var styles = /*#__PURE__*/StyleSheet.create({
   container: {
     alignItems: "center",
-    backgroundColor: containerBackgroundColor,
+    backgroundColor: "transparent",
     bottom: 0,
     flex: 1,
     flexDirection: "column",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
     left: 0,
     paddingHorizontal: 20,
     paddingVertical: 13,
@@ -22,9 +20,8 @@ var styles = /*#__PURE__*/StyleSheet.create({
   },
   controlsRow: {
     alignItems: "center",
-    alignSelf: "stretch",
-    flex: 1,
-    justifyContent: "center"
+    justifyContent: "center",
+    width: "100%"
   },
   fullScreenContainer: {
     alignItems: "center",
@@ -33,41 +30,45 @@ var styles = /*#__PURE__*/StyleSheet.create({
     paddingLeft: 20
   },
   playButton: {
+    borderColor: "white",
+    height: 40,
+    width: 40,
+    backgroundColor: "transparent",
     alignItems: "center",
-    borderColor: playButtonBorderColor,
-    borderRadius: 3,
-    borderWidth: 1.5,
-    height: 50,
     justifyContent: "center",
-    width: 50
+    alignSelf: "flex-start",
+    marginRight: 10
   },
   playIcon: {
     height: 22,
     resizeMode: "contain",
-    width: 22
+    width: 22,
+    alignSelf: "center"
   },
   progressColumnContainer: {
     flex: 1
   },
   progressContainer: {
     flexDirection: "row",
-    justifyContent: "flex-end",
-    marginBottom: -25
+    justifyContent: "flex-end"
   },
   progressSlider: {
-    alignSelf: "stretch"
+    alignSelf: "stretch",
+    marginTop: 5,
+    marginHorizontal: -15
   },
   replayIcon: {
     height: 20,
     resizeMode: "stretch",
-    width: 25
+    width: 25,
+    color: "white"
   },
   thumb: {
     backgroundColor: white,
-    borderRadius: 50,
+    borderRadius: 15 / 2,
     borderWidth: 3,
-    height: 20,
-    width: 20
+    height: 15,
+    width: 15
   },
   timeRow: {
     alignSelf: "stretch"
@@ -95,6 +96,10 @@ var styles = /*#__PURE__*/StyleSheet.create({
   track: {
     borderRadius: 1,
     height: 5
+  },
+  controllerContainer: {
+    width: "100%",
+    flexDirection: "row"
   }
 });
 
@@ -118,10 +123,10 @@ var humanizeVideoDuration = function humanizeVideoDuration(seconds) {
 var getPlayerStateIcon = function getPlayerStateIcon(playerState) {
   switch (playerState) {
     case PLAYER_STATES.PAUSED:
-      return require("./assets/ic_play.png");
+      return require("./assets/ic_play_new.png");
 
     case PLAYER_STATES.PLAYING:
-      return require("./assets/ic_pause.png");
+      return require("./assets/ic_pause_new.png");
 
     case PLAYER_STATES.ENDED:
       return require("./assets/ic_replay.png");
@@ -130,29 +135,54 @@ var getPlayerStateIcon = function getPlayerStateIcon(playerState) {
       return null;
   }
 };
+var getPlayerVolume = function getPlayerVolume(volume) {
+  switch (volume) {
+    case 0:
+      return require("./assets/ic_volume_mute.png");
+
+    case 0.5:
+      return require("./assets/ic_volume_medium.png");
+
+    case 1:
+      return require("./assets/ic_volume_high.png");
+  }
+};
 
 var Controls = function Controls(props) {
-  var isLoading = props.isLoading,
-      mainColor = props.mainColor,
-      playerState = props.playerState,
+  var playerState = props.playerState,
+      volume = props.volume,
       onReplay = props.onReplay,
-      onPause = props.onPause;
+      onPause = props.onPause,
+      onVolumePress = props.onVolumePress;
   var icon = getPlayerStateIcon(playerState);
+  var volumeIcon = getPlayerVolume(volume);
   var pressAction = playerState === PLAYER_STATES.ENDED ? onReplay : onPause;
-  var content = isLoading ? React.createElement(ActivityIndicator, {
-    size: "large",
-    color: "#FFF"
-  }) : React.createElement(TouchableOpacity, {
-    style: [styles.playButton, {
-      backgroundColor: mainColor
-    }],
+
+  var handleVolumeActionPress = function handleVolumeActionPress() {
+    onVolumePress();
+  };
+
+  var content = React.createElement(View, {
+    style: styles.controllerContainer
+  }, React.createElement(TouchableOpacity, {
+    style: [styles.playButton],
+    activeOpacity: 1,
     onPress: pressAction,
     accessibilityLabel: PLAYER_STATES.PAUSED ? "Tap to Play" : "Tap to Pause",
     accessibilityHint: "Plays and Pauses the Video"
   }, React.createElement(Image, {
     source: icon,
     style: styles.playIcon
-  }));
+  })), React.createElement(TouchableOpacity, {
+    style: [styles.playButton],
+    onPress: handleVolumeActionPress,
+    activeOpacity: 1,
+    accessibilityLabel: volume === 0 ? "Player muted" : volume === 0.5 ? "Player volume medium" : "Player volume high",
+    accessibilityHint: "Indicates player volume"
+  }, React.createElement(Image, {
+    source: volumeIcon,
+    style: styles.playIcon
+  })));
   return React.createElement(View, {
     style: [styles.controlsRow]
   }, content);
@@ -167,9 +197,8 @@ var Slider = function Slider(props) {
       onFullScreen = props.onFullScreen,
       onPause = props.onPause,
       progress = props.progress;
-  var containerStyle = (customSliderStyle === null || customSliderStyle === void 0 ? void 0 : customSliderStyle.containerStyle) || {};
-  var customTrackStyle = (customSliderStyle === null || customSliderStyle === void 0 ? void 0 : customSliderStyle.trackStyle) || {};
-  var customThumbStyle = (customSliderStyle === null || customSliderStyle === void 0 ? void 0 : customSliderStyle.thumbStyle) || {};
+  var containerStyle = (customSliderStyle == null ? void 0 : customSliderStyle.containerStyle) || {}; // const customTrackStyle = customSliderStyle?.trackStyle || {};
+  // const customThumbStyle = customSliderStyle?.thumbStyle || {};
 
   var dragging = function dragging(value) {
     var onSeeking = props.onSeeking,
@@ -200,15 +229,14 @@ var Slider = function Slider(props) {
     style: styles.timerLabel
   }, humanizeVideoDuration(duration))), React.createElement(RNSlider, {
     style: [styles.progressSlider],
+    thumbTintColor: mainColor,
+    maximumTrackTintColor: mainColor,
     onValueChange: dragging,
     onSlidingComplete: seekVideo,
     maximumValue: Math.floor(duration),
     value: Math.floor(progress),
-    trackStyle: [styles.track, customTrackStyle],
-    thumbStyle: [styles.thumb, customThumbStyle, {
-      borderColor: mainColor
-    }],
-    minimumTrackTintColor: mainColor
+    minimumTrackTintColor: mainColor,
+    disabled: false
   })), Boolean(onFullScreen) && React.createElement(TouchableOpacity, {
     style: styles.fullScreenContainer,
     onPress: onFullScreen
@@ -223,8 +251,7 @@ var Toolbar = function Toolbar(_ref) {
 };
 
 var MediaControls = function MediaControls(props) {
-  var children = props.children,
-      _props$containerStyle = props.containerStyle,
+  var _props$containerStyle = props.containerStyle,
       customContainerStyle = _props$containerStyle === void 0 ? {} : _props$containerStyle,
       duration = props.duration,
       _props$fadeOutDelay = props.fadeOutDelay,
@@ -242,8 +269,8 @@ var MediaControls = function MediaControls(props) {
       _props$showOnStart = props.showOnStart,
       showOnStart = _props$showOnStart === void 0 ? true : _props$showOnStart,
       sliderStyle = props.sliderStyle,
-      _props$toolbarStyle = props.toolbarStyle,
-      customToolbarStyle = _props$toolbarStyle === void 0 ? {} : _props$toolbarStyle;
+      onVolumeChange = props.onVolumeChange,
+      volume = props.volume;
 
   var _ref = function () {
     if (showOnStart) {
@@ -268,9 +295,9 @@ var MediaControls = function MediaControls(props) {
       isVisible = _useState2[0],
       setIsVisible = _useState2[1];
 
-  useEffect(function () {
-    fadeOutControls(fadeOutDelay);
-  }, []);
+  var _useState3 = useState(initialIsVisible),
+      isSliderVisible = _useState3[0],
+      setIsSliderVisible = _useState3[1];
 
   var fadeOutControls = function fadeOutControls(delay) {
     if (delay === void 0) {
@@ -291,12 +318,25 @@ var MediaControls = function MediaControls(props) {
     });
   };
 
+  useEffect(function () {
+    fadeOutControls(fadeOutDelay); // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  var handleVolumePress = function handleVolumePress() {
+    onVolumeChange();
+  };
+
   var fadeInControls = function fadeInControls(loop) {
     if (loop === void 0) {
       loop = true;
     }
 
     setIsVisible(true);
+
+    if (!isSliderVisible) {
+      setIsSliderVisible(true);
+    }
+
     Animated.timing(opacity, {
       toValue: 1,
       duration: 300,
@@ -321,12 +361,12 @@ var MediaControls = function MediaControls(props) {
   };
 
   var onPause = function onPause() {
-    var playerState = props.playerState,
+    var pState = props.playerState,
         onPaused = props.onPaused;
     var PLAYING = PLAYER_STATES.PLAYING,
         PAUSED = PLAYER_STATES.PAUSED;
 
-    switch (playerState) {
+    switch (pState) {
       case PLAYING:
         {
           cancelAnimation();
@@ -357,20 +397,12 @@ var MediaControls = function MediaControls(props) {
     accessible: false,
     onPress: toggleControls
   }, React.createElement(Animated.View, {
-    style: [styles.container, {
+    style: [styles.container, customContainerStyle, {
       opacity: opacity
     }]
   }, isVisible && React.createElement(View, {
     style: [styles.container, customContainerStyle]
-  }, React.createElement(View, {
-    style: [styles.controlsRow, styles.toolbarRow, customToolbarStyle]
-  }, children), React.createElement(Controls, {
-    onPause: onPause,
-    onReplay: onReplay,
-    isLoading: isLoading,
-    mainColor: mainColor,
-    playerState: playerState
-  }), React.createElement(Slider, {
+  }, React.createElement(Slider, {
     progress: progress,
     duration: duration,
     mainColor: mainColor,
@@ -380,6 +412,14 @@ var MediaControls = function MediaControls(props) {
     onSeeking: onSeeking,
     onPause: onPause,
     customSliderStyle: sliderStyle
+  }), React.createElement(Controls, {
+    onPause: onPause,
+    onReplay: onReplay,
+    isLoading: isLoading,
+    mainColor: mainColor,
+    playerState: playerState,
+    onVolumePress: handleVolumePress,
+    volume: volume
   }))));
 };
 

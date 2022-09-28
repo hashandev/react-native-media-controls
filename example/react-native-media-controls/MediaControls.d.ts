@@ -3,8 +3,8 @@ import { GestureResponderEvent, ViewStyle } from "react-native";
 import { PLAYER_STATES } from "./constants/playerStates";
 import { CustomSliderStyle } from "./Slider";
 export declare type Props = {
-    children: React.ReactNode;
-    containerStyle: ViewStyle;
+    children?: React.ReactNode;
+    containerStyle?: ViewStyle;
     duration: number;
     fadeOutDelay?: number;
     isFullScreen: boolean;
@@ -18,8 +18,10 @@ export declare type Props = {
     playerState: PLAYER_STATES;
     progress: number;
     showOnStart?: boolean;
-    sliderStyle: CustomSliderStyle;
-    toolbarStyle: ViewStyle;
+    sliderStyle?: CustomSliderStyle;
+    toolbarStyle?: ViewStyle;
+    volume: number;
+    onVolumeChange: () => void;
 };
 declare const MediaControls: {
     (props: Props): JSX.Element;

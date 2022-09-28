@@ -65,19 +65,18 @@ const App = () => {
         ref={(ref) => (videoPlayer.current = ref)}
         resizeMode="cover"
         source={{
-          uri:
-            "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          uri: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
         }}
         repeat
         style={styles.mediaPlayer}
         volume={0.0}
       />
       <MediaControls
-        isFullScreen={isFullScreen}
+        isFullScreen={false}
         duration={duration}
         isLoading={isLoading}
-        mainColor="orange"
-        onFullScreen={noop}
+        mainColor="white"
+        // onFullScreen={noop}
         onPaused={onPaused}
         onReplay={onReplay}
         onSeek={onSeek}

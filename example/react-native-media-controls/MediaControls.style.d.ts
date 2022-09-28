@@ -5,7 +5,7 @@ declare const _default: {
         bottom: number;
         flex: number;
         flexDirection: "column";
-        justifyContent: "space-between";
+        justifyContent: "flex-end";
         left: number;
         paddingHorizontal: number;
         paddingVertical: number;
@@ -15,9 +15,8 @@ declare const _default: {
     };
     controlsRow: {
         alignItems: "center";
-        alignSelf: "stretch";
-        flex: number;
         justifyContent: "center";
+        width: string;
     };
     fullScreenContainer: {
         alignItems: "center";
@@ -26,18 +25,20 @@ declare const _default: {
         paddingLeft: number;
     };
     playButton: {
-        alignItems: "center";
         borderColor: string;
-        borderRadius: number;
-        borderWidth: number;
         height: number;
-        justifyContent: "center";
         width: number;
+        backgroundColor: string;
+        alignItems: "center";
+        justifyContent: "center";
+        alignSelf: "flex-start";
+        marginRight: number;
     };
     playIcon: {
         height: number;
         resizeMode: "contain";
         width: number;
+        alignSelf: "center";
     };
     progressColumnContainer: {
         flex: number;
@@ -45,15 +46,17 @@ declare const _default: {
     progressContainer: {
         flexDirection: "row";
         justifyContent: "flex-end";
-        marginBottom: number;
     };
     progressSlider: {
         alignSelf: "stretch";
+        marginTop: number;
+        marginHorizontal: number;
     };
     replayIcon: {
         height: number;
         resizeMode: "stretch";
         width: number;
+        color: string;
     };
     thumb: {
         backgroundColor: string;
@@ -88,6 +91,10 @@ declare const _default: {
     track: {
         borderRadius: number;
         height: number;
+    };
+    controllerContainer: {
+        width: string;
+        flexDirection: "row";
     };
 };
 export default _default;

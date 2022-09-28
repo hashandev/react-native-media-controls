@@ -49,6 +49,8 @@ declare const _default: {
     };
     progressSlider: {
         alignSelf: "stretch";
+        marginTop: number;
+        marginHorizontal: number;
     };
     replayIcon: {
         height: number;

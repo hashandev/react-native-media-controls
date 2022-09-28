@@ -7,14 +7,13 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 var React = require('react');
 var React__default = _interopDefault(React);
 var reactNative = require('react-native');
-var RNSlider = _interopDefault(require('react-native-slider'));
+var RNSlider = _interopDefault(require('@react-native-community/slider'));
 
 var white = "#fff";
 var styles = /*#__PURE__*/reactNative.StyleSheet.create({
   container: {
     alignItems: "center",
-    // backgroundColor: containerBackgroundColor,
-    backgroundColor: "blue",
+    backgroundColor: "transparent",
     bottom: 0,
     flex: 1,
     flexDirection: "column",
@@ -61,7 +60,9 @@ var styles = /*#__PURE__*/reactNative.StyleSheet.create({
     justifyContent: "flex-end"
   },
   progressSlider: {
-    alignSelf: "stretch"
+    alignSelf: "stretch",
+    marginTop: 5,
+    marginHorizontal: -15
   },
   replayIcon: {
     height: 20,
@@ -201,9 +202,8 @@ var Slider = function Slider(props) {
       onFullScreen = props.onFullScreen,
       onPause = props.onPause,
       progress = props.progress;
-  var containerStyle = (customSliderStyle === null || customSliderStyle === void 0 ? void 0 : customSliderStyle.containerStyle) || {};
-  var customTrackStyle = (customSliderStyle === null || customSliderStyle === void 0 ? void 0 : customSliderStyle.trackStyle) || {};
-  var customThumbStyle = (customSliderStyle === null || customSliderStyle === void 0 ? void 0 : customSliderStyle.thumbStyle) || {};
+  var containerStyle = (customSliderStyle == null ? void 0 : customSliderStyle.containerStyle) || {}; // const customTrackStyle = customSliderStyle?.trackStyle || {};
+  // const customThumbStyle = customSliderStyle?.thumbStyle || {};
 
   var dragging = function dragging(value) {
     var onSeeking = props.onSeeking,
@@ -234,17 +234,14 @@ var Slider = function Slider(props) {
     style: styles.timerLabel
   }, humanizeVideoDuration(duration))), React__default.createElement(RNSlider, {
     style: [styles.progressSlider],
+    thumbTintColor: mainColor,
+    maximumTrackTintColor: mainColor,
     onValueChange: dragging,
     onSlidingComplete: seekVideo,
     maximumValue: Math.floor(duration),
     value: Math.floor(progress),
-    trackStyle: [styles.track, customTrackStyle],
-    thumbStyle: [styles.thumb, customThumbStyle, {
-      borderColor: mainColor
-    }],
     minimumTrackTintColor: mainColor,
-    disabled: false,
-    iconComponent: null
+    disabled: false
   })), Boolean(onFullScreen) && React__default.createElement(reactNative.TouchableOpacity, {
     style: styles.fullScreenContainer,
     onPress: onFullScreen

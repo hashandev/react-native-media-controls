@@ -53,6 +53,8 @@ export default StyleSheet.create({
   },
   progressSlider: {
     alignSelf: "stretch",
+    marginTop: 5,
+    marginHorizontal: -15,
   },
   replayIcon: {
     height: 20,
